@@ -1,13 +1,36 @@
 
 import { css } from "@emotion/react";
 import localFont from "next/font/local";
+import { RadioBrowserApi , Station} from 'radio-browser-api'
+import { useEffect } from "react";
 
 
-const myFont = localFont({
-  src:"../assets/digital.ttf",
-});
+const api = new RadioBrowserApi('My Radio App')
+const fetchRadio = async () => {
+  try {
+    const stations = await api.searchStations({
+     countryCode: 'TN',
+    })
+    const filter = "Radio"
+    const filteredRadios = stations.filter((radio : Station) => radio.name.includes(
+      filter
+    ))
+    console.log(stations)
+    return stations
+  }
+  // query stations by country code and limit to first 100 stations
+  catch (err) {
+    console.log(err)
+  }
+}
 
-const containerStyles = css`
+
+
+  const myFont = localFont({
+    src: "../assets/digital.ttf",
+  });
+
+  const containerStyles = css`
   position: relative;
   display: flex;
   flex-direction: column;
@@ -24,7 +47,7 @@ width: 600px;
   align-items: center;
 `;
 
-const mask = css`
+  const mask = css`
 position: absolute;
 top: 0;
 left: 0;
@@ -37,7 +60,7 @@ background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
 background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
 `;
 
-const glowinganiText = css`
+  const glowinganiText = css`
 color: white;
 font-size: 3rem;
 font-weight: bold;
@@ -64,25 +87,20 @@ to {
 
 
 
-const RadioDisplay: React.FC = () => {
-  return (
-    <div css={containerStyles}>
-      <div className={myFont.className} css={glowinganiText}>Welcome to Radio</div>
-      <div className={myFont.className} css={glowingText}>Radio FM</div>
-      <div css={mask}></div>
-      
+  const RadioDisplay: React.FC = () => {
+    useEffect(() => {
+      // console.log(fetchRadio())
+      const radios = fetchRadio()
+      // filter the ones that have RTCI in their name
+    }, [])
+    return (
+      <div css={containerStyles}>
+        <div className={myFont.className} css={glowinganiText}>Welcome to Radio</div>
+        <div className={myFont.className} css={glowingText}>Radio FM</div>
+        <div css={mask}></div>
+      </div>
+    );
+  };
 
-      {/* <Image src={hexagone.src} alt="hexagone" width={500} height={500} style={{
-        position: "absolute",
-        display: "block",
-        width: "100%",
-        height: "100%",
-        objectFit: "cover",
-        objectPosition: "center",
-        filter: "blur(1px)",
-        zIndex: 0,
-      }}/> */}
-    </div>
-  );
-};
-export default RadioDisplay;
+
+  export default RadioDisplay;
